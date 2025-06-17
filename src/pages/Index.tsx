@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -5,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { VoiceVisualizer } from '@/components/VoiceVisualizer';
 import { ChatMessage } from '@/components/ChatMessage';
 import { FeatureGrid } from '@/components/FeatureGrid';
+import VoiceRecognition from '@/components/VoiceRecognition';
 import { Mic, MicOff, Settings } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -20,56 +22,27 @@ const Index = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const recognition = useRef<SpeechRecognition | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Initialize speech recognition
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognitionConstructor = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      recognition.current = new SpeechRecognitionConstructor();
-      recognition.current.continuous = true;
-      recognition.current.interimResults = true;
-      recognition.current.lang = 'en-US';
-
-      recognition.current.onresult = (event: SpeechRecognitionEvent) => {
-        const transcript = Array.from(event.results)
-          .map(result => result[0].transcript)
-          .join('');
-        
-        if (transcript.toLowerCase().includes('hey jarvis')) {
-          setIsListening(true);
-          toast({ title: "JARVIS Activated", description: "Listening for your command..." });
-        }
-      };
-
-      recognition.current.onerror = (event: SpeechRecognitionErrorEvent) => {
-        console.error('Speech recognition error:', event.error);
-        setIsListening(false);
-      };
-
-      // Start passive listening for wake word
-      recognition.current.start();
-    }
-
-    return () => {
-      if (recognition.current) {
-        recognition.current.stop();
-      }
-    };
-  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const handleTranscript = (transcript: string) => {
+    if (transcript.toLowerCase().includes('hey jarvis')) {
+      toast({ title: "JARVIS Activated", description: "Listening for your command..." });
+    }
+  };
+
+  const handleListeningChange = (listening: boolean) => {
+    setIsListening(listening);
+  };
+
   const handleVoiceToggle = () => {
     if (isListening) {
       setIsListening(false);
-      recognition.current?.stop();
     } else {
       setIsListening(true);
-      recognition.current?.start();
       toast({ title: "Listening...", description: "Speak your command" });
     }
   };
@@ -110,6 +83,13 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white">
+      {/* Voice Recognition Component */}
+      <VoiceRecognition 
+        onTranscript={handleTranscript}
+        onListeningChange={handleListeningChange}
+        isListening={isListening}
+      />
+
       {/* Header */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-blue-500/30">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
