@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -27,13 +26,13 @@ const Index = () => {
   useEffect(() => {
     // Initialize speech recognition
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition.current = new SpeechRecognition();
+      const SpeechRecognitionConstructor = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      recognition.current = new SpeechRecognitionConstructor();
       recognition.current.continuous = true;
       recognition.current.interimResults = true;
       recognition.current.lang = 'en-US';
 
-      recognition.current.onresult = (event) => {
+      recognition.current.onresult = (event: SpeechRecognitionEvent) => {
         const transcript = Array.from(event.results)
           .map(result => result[0].transcript)
           .join('');
@@ -44,7 +43,7 @@ const Index = () => {
         }
       };
 
-      recognition.current.onerror = (event) => {
+      recognition.current.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
       };
