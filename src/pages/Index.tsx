@@ -98,7 +98,13 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white relative overflow-hidden">
+      {/* Enhanced background effects */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(59,130,246,0.1),transparent_50%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(147,51,234,0.1),transparent_50%)]"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+
       {/* Voice Recognition Component */}
       <VoiceRecognition 
         onTranscript={handleTranscript}
@@ -106,33 +112,37 @@ const Index = () => {
         isListening={isListening}
       />
 
-      {/* Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-blue-500/30">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      {/* Enhanced Header */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-xl border-b border-white/10 shadow-2xl shadow-blue-500/20">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-purple-500/5"></div>
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between relative z-10">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full animate-pulse"></div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            <div className="relative">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 rounded-full animate-pulse shadow-lg shadow-blue-500/50"></div>
+              <div className="absolute inset-1 bg-white/10 rounded-full backdrop-blur-sm border border-white/20"></div>
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
               JARVIS
             </h1>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-300 hidden sm:block">
+            <span className="text-sm text-gray-300 hidden sm:block font-light">
               Welcome, {user?.email}
             </span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-blue-400 hover:text-blue-300">
+                <Button variant="ghost" size="icon" className="text-blue-400 hover:text-blue-300 hover:bg-white/10 transition-all duration-300">
                   <User className="w-5 h-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-gray-800 border-gray-700">
-                <DropdownMenuItem className="text-white hover:bg-gray-700 cursor-pointer">
+              <DropdownMenuContent align="end" className="bg-black/80 backdrop-blur-xl border-white/20 shadow-2xl shadow-blue-500/20">
+                <DropdownMenuItem className="text-white hover:bg-white/10 cursor-pointer transition-all duration-300">
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={handleSignOut}
-                  className="text-white hover:bg-gray-700 cursor-pointer"
+                  className="text-white hover:bg-white/10 cursor-pointer transition-all duration-300"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign Out
@@ -144,31 +154,37 @@ const Index = () => {
       </div>
 
       {/* Main Content */}
-      <div className="pt-20 pb-32 px-4">
+      <div className="pt-20 pb-32 px-4 relative z-10">
         <div className="container mx-auto max-w-6xl">
-          {/* Welcome Section */}
+          {/* Enhanced Welcome Section */}
           {messages.length === 0 && (
             <div className="text-center mb-12">
               <div className="mb-8">
-                <div className="w-32 h-32 mx-auto bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full animate-pulse mb-6 flex items-center justify-center">
-                  <div className="w-24 h-24 bg-white/10 rounded-full backdrop-blur-sm"></div>
+                <div className="relative mx-auto mb-8">
+                  <div className="w-40 h-40 mx-auto bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 rounded-full animate-pulse shadow-2xl shadow-blue-500/50">
+                    <div className="absolute inset-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full backdrop-blur-sm border border-white/10"></div>
+                    <div className="absolute inset-6 bg-white/5 rounded-full backdrop-blur-sm"></div>
+                  </div>
+                  <div className="absolute -inset-8 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-2xl opacity-50 animate-pulse"></div>
                 </div>
-                <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
                   Good Evening, Sir
                 </h2>
-                <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+                <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed font-light">
                   I'm JARVIS, your AI-powered personal assistant. I can help you with web searches, smart home control, 
                   task automation, and much more. Try saying "Hey JARVIS" or type your command below.
                 </p>
+                <div className="w-48 h-1 bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 mx-auto mt-6 rounded-full opacity-70"></div>
               </div>
               <FeatureGrid />
             </div>
           )}
 
-          {/* Chat Messages */}
+          {/* Enhanced Chat Messages */}
           {messages.length > 0 && (
-            <Card className="bg-black/40 backdrop-blur-md border-blue-500/30 mb-6 max-h-96 overflow-y-auto">
-              <div className="p-6 space-y-4">
+            <Card className="bg-black/30 backdrop-blur-xl border border-white/10 shadow-2xl shadow-blue-500/20 mb-6 max-h-96 overflow-y-auto relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 rounded-lg"></div>
+              <div className="p-6 space-y-4 relative z-10">
                 {messages.map((message) => (
                   <ChatMessage key={message.id} message={message} />
                 ))}
@@ -192,9 +208,10 @@ const Index = () => {
       {/* Voice Visualizer */}
       {isListening && <VoiceVisualizer />}
 
-      {/* Input Area */}
-      <div className="fixed bottom-0 left-0 right-0 bg-black/40 backdrop-blur-md border-t border-blue-500/30 p-4">
-        <div className="container mx-auto max-w-4xl">
+      {/* Enhanced Input Area */}
+      <div className="fixed bottom-0 left-0 right-0 bg-black/30 backdrop-blur-xl border-t border-white/10 p-4 shadow-2xl shadow-blue-500/20">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-purple-500/5"></div>
+        <div className="container mx-auto max-w-4xl relative z-10">
           <div className="flex items-end space-x-4">
             <div className="flex-1">
               <Textarea
@@ -202,7 +219,7 @@ const Index = () => {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask JARVIS anything..."
-                className="bg-gray-800/50 border-blue-500/30 text-white placeholder-gray-400 resize-none min-h-[60px] focus:border-blue-400"
+                className="bg-black/20 backdrop-blur-sm border-white/20 text-white placeholder-gray-400 resize-none min-h-[60px] focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300"
                 rows={2}
               />
             </div>
@@ -210,18 +227,18 @@ const Index = () => {
               <Button
                 onClick={handleVoiceToggle}
                 size="icon"
-                className={`w-12 h-12 rounded-full transition-all duration-300 ${
+                className={`w-12 h-12 rounded-full transition-all duration-300 shadow-lg ${
                   isListening 
-                    ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
-                    : 'bg-blue-500 hover:bg-blue-600'
-                }`}
+                    ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 animate-pulse shadow-red-500/30' 
+                    : 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-blue-500/30'
+                } transform hover:scale-105`}
               >
                 {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
               </Button>
               <Button
                 onClick={handleSendMessage}
                 disabled={!inputText.trim() || isProcessing}
-                className="px-6 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 disabled:opacity-50"
+                className="px-6 bg-gradient-to-r from-blue-500 via-cyan-500 to-purple-500 hover:from-blue-600 hover:via-cyan-600 hover:to-purple-600 disabled:opacity-50 shadow-lg shadow-blue-500/30 transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100"
               >
                 Send
               </Button>

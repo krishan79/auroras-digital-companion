@@ -21,20 +21,23 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
       isUser ? "justify-end" : "justify-start"
     )}>
       <div className={cn(
-        "max-w-[70%] rounded-lg p-4 break-words",
+        "max-w-[70%] rounded-xl p-4 break-words relative overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl",
         isUser 
-          ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white" 
-          : "bg-gray-800/50 text-gray-100 border border-gray-700"
+          ? "bg-gradient-to-r from-blue-500 via-cyan-500 to-purple-500 text-white shadow-blue-500/30 hover:shadow-blue-500/40" 
+          : "bg-black/30 backdrop-blur-xl text-gray-100 border border-white/10 shadow-blue-500/20 hover:shadow-blue-500/30"
       )}>
         {!isUser && (
-          <div className="flex items-center space-x-2 mb-2">
-            <div className="w-6 h-6 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full"></div>
-            <span className="text-sm font-medium text-blue-400">JARVIS</span>
-          </div>
+          <>
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5"></div>
+            <div className="flex items-center space-x-2 mb-2 relative z-10">
+              <div className="w-6 h-6 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full shadow-lg shadow-blue-500/30"></div>
+              <span className="text-sm font-medium text-blue-400">JARVIS</span>
+            </div>
+          </>
         )}
-        <p className="leading-relaxed">{message.text}</p>
+        <p className="leading-relaxed relative z-10">{message.text}</p>
         <p className={cn(
-          "text-xs mt-2 opacity-70",
+          "text-xs mt-2 opacity-70 relative z-10",
           isUser ? "text-blue-100" : "text-gray-400"
         )}>
           {message.timestamp.toLocaleTimeString()}
