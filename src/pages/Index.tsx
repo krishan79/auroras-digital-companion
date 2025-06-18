@@ -7,8 +7,15 @@ import { VoiceVisualizer } from '@/components/VoiceVisualizer';
 import { ChatMessage } from '@/components/ChatMessage';
 import { FeatureGrid } from '@/components/FeatureGrid';
 import VoiceRecognition from '@/components/VoiceRecognition';
-import { Mic, MicOff, Settings } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Mic, MicOff, Settings, LogOut, User } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface Message {
   id: string;
@@ -23,6 +30,7 @@ const Index = () => {
   const [inputText, setInputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -81,6 +89,14 @@ const Index = () => {
     }
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Signed Out",
+      description: "You have been successfully signed out"
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white">
       {/* Voice Recognition Component */}
@@ -99,9 +115,31 @@ const Index = () => {
               JARVIS
             </h1>
           </div>
-          <Button variant="ghost" size="icon" className="text-blue-400 hover:text-blue-300">
-            <Settings className="w-5 h-5" />
-          </Button>
+          <div className="flex items-center space-x-4">
+            <span className="text-sm text-gray-300 hidden sm:block">
+              Welcome, {user?.email}
+            </span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-blue-400 hover:text-blue-300">
+                  <User className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-gray-800 border-gray-700">
+                <DropdownMenuItem className="text-white hover:bg-gray-700 cursor-pointer">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={handleSignOut}
+                  className="text-white hover:bg-gray-700 cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
 
