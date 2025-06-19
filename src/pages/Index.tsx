@@ -9,7 +9,9 @@ import { FeatureGrid } from '@/components/FeatureGrid';
 import VoiceRecognition from '@/components/VoiceRecognition';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOpenAI } from '@/hooks/useOpenAI';
-import { Mic, MicOff, Settings, LogOut, User } from 'lucide-react';
+import { useTTS } from '@/hooks/useTTS';
+import { useCommandExecutor } from '@/hooks/useCommandExecutor';
+import { Mic, MicOff, Settings, LogOut, User, Volume2, VolumeX } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import {
   DropdownMenu,
@@ -29,9 +31,12 @@ const Index = () => {
   const [isListening, setIsListening] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
+  const [ttsEnabled, setTtsEnabled] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user, signOut } = useAuth();
   const { sendMessage, isLoading: isProcessing } = useOpenAI();
+  const { speak, isSpeaking } = useTTS();
+  const { executeCommand } = useCommandExecutor();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -99,6 +104,19 @@ const Index = () => {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+
+      // Execute command if detected
+      const commandExecuted = await executeCommand(textToSend);
+
+      // Speak response if TTS is enabled
+      if (ttsEnabled && aiResponse) {
+        try {
+          await speak(aiResponse);
+        } catch (error) {
+          console.error('TTS error:', error);
+        }
+      }
+
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -132,7 +150,6 @@ const Index = () => {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
-      {/* Voice Recognition Component */}
       <VoiceRecognition 
         onTranscript={handleTranscript}
         onListeningChange={handleListeningChange}
@@ -153,6 +170,16 @@ const Index = () => {
             </h1>
           </div>
           <div className="flex items-center space-x-4">
+            <Button
+              onClick={() => setTtsEnabled(!ttsEnabled)}
+              variant="ghost"
+              size="icon"
+              className={`text-blue-400 hover:text-blue-300 hover:bg-white/10 transition-all duration-300 ${
+                isSpeaking ? 'animate-pulse' : ''
+              }`}
+            >
+              {ttsEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+            </Button>
             <span className="text-sm text-gray-300 hidden sm:block font-light">
               Welcome, {user?.email}
             </span>
@@ -215,14 +242,16 @@ const Index = () => {
                 {messages.map((message) => (
                   <ChatMessage key={message.id} message={message} />
                 ))}
-                {isProcessing && (
+                {(isProcessing || isSpeaking) && (
                   <div className="flex items-center space-x-3 text-blue-400">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
                       <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-75"></div>
                       <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-150"></div>
                     </div>
-                    <span>JARVIS is thinking...</span>
+                    <span>
+                      {isProcessing ? 'JARVIS is thinking...' : 'JARVIS is speaking...'}
+                    </span>
                   </div>
                 )}
                 <div ref={messagesEndRef} />
@@ -254,17 +283,18 @@ const Index = () => {
               <Button
                 onClick={handleVoiceToggle}
                 size="icon"
+                disabled={isSpeaking}
                 className={`w-12 h-12 rounded-full transition-all duration-300 shadow-lg ${
                   isListening 
                     ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 animate-pulse shadow-red-500/30' 
                     : 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-blue-500/30'
-                } transform hover:scale-105`}
+                } transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100`}
               >
                 {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
               </Button>
               <Button
                 onClick={() => handleSendMessage()}
-                disabled={!inputText.trim() || isProcessing}
+                disabled={!inputText.trim() || isProcessing || isSpeaking}
                 className="px-6 bg-gradient-to-r from-blue-500 via-cyan-500 to-purple-500 hover:from-blue-600 hover:via-cyan-600 hover:to-purple-600 disabled:opacity-50 shadow-lg shadow-blue-500/30 transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100"
               >
                 Send
