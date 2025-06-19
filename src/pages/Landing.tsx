@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { FeatureGrid } from '@/components/FeatureGrid';
@@ -11,7 +10,7 @@ const Landing = () => {
 
   // Redirect authenticated users to the main app
   if (!loading && user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/app" replace />;
   }
 
   if (loading) {

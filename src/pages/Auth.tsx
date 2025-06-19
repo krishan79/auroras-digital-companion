@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -21,7 +20,7 @@ const Auth = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (!loading && user) {
-      navigate('/');
+      navigate('/app');
     }
   }, [user, loading, navigate]);
 
@@ -50,7 +49,7 @@ const Auth = () => {
         title: "Welcome back!",
         description: "You have successfully signed in"
       });
-      navigate('/');
+      navigate('/app');
     }
     setIsLoading(false);
   };
