@@ -8,6 +8,7 @@ import { ChatMessage } from '@/components/ChatMessage';
 import { FeatureGrid } from '@/components/FeatureGrid';
 import VoiceRecognition from '@/components/VoiceRecognition';
 import { useAuth } from '@/contexts/AuthContext';
+import { useOpenAI } from '@/hooks/useOpenAI';
 import { Mic, MicOff, Settings, LogOut, User } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import {
@@ -28,9 +29,9 @@ const Index = () => {
   const [isListening, setIsListening] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user, signOut } = useAuth();
+  const { sendMessage, isLoading: isProcessing } = useOpenAI();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -39,6 +40,12 @@ const Index = () => {
   const handleTranscript = (transcript: string) => {
     if (transcript.toLowerCase().includes('hey jarvis')) {
       toast({ title: "JARVIS Activated", description: "Listening for your command..." });
+      // Extract the command after "hey jarvis"
+      const command = transcript.toLowerCase().replace('hey jarvis', '').trim();
+      if (command) {
+        setInputText(command);
+        handleSendMessage(command);
+      }
     }
   };
 
@@ -55,31 +62,51 @@ const Index = () => {
     }
   };
 
-  const handleSendMessage = async () => {
-    if (!inputText.trim()) return;
+  const handleSendMessage = async (messageText?: string) => {
+    const textToSend = messageText || inputText;
+    if (!textToSend.trim()) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: inputText,
+      text: textToSend,
       type: 'user',
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
     setInputText('');
-    setIsProcessing(true);
 
-    // Simulate AI response (replace with actual API call)
-    setTimeout(() => {
+    try {
+      // Convert messages to OpenAI format
+      const openAIMessages = messages.map(msg => ({
+        role: msg.type === 'user' ? 'user' as const : 'assistant' as const,
+        content: msg.text
+      }));
+      
+      // Add the current user message
+      openAIMessages.push({
+        role: 'user' as const,
+        content: textToSend
+      });
+
+      const aiResponse = await sendMessage(openAIMessages);
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: `I understand you want me to: "${inputText}". I'm processing your request and will execute it shortly. This is a placeholder response - in the full implementation, I'll integrate with OpenAI GPT-4o and other APIs to provide real functionality.`,
+        text: aiResponse,
         type: 'assistant',
         timestamp: new Date()
       };
+
       setMessages(prev => [...prev, assistantMessage]);
-      setIsProcessing(false);
-    }, 1500);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to get response from JARVIS. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -195,7 +222,7 @@ const Index = () => {
                       <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-75"></div>
                       <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-150"></div>
                     </div>
-                    <span>JARVIS is processing...</span>
+                    <span>JARVIS is thinking...</span>
                   </div>
                 )}
                 <div ref={messagesEndRef} />
@@ -236,7 +263,7 @@ const Index = () => {
                 {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
               </Button>
               <Button
-                onClick={handleSendMessage}
+                onClick={() => handleSendMessage()}
                 disabled={!inputText.trim() || isProcessing}
                 className="px-6 bg-gradient-to-r from-blue-500 via-cyan-500 to-purple-500 hover:from-blue-600 hover:via-cyan-600 hover:to-purple-600 disabled:opacity-50 shadow-lg shadow-blue-500/30 transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100"
               >
